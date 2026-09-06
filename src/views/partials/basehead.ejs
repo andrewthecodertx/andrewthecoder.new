@@ -1,0 +1,43 @@
+<%
+    const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+%>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0a0a" />
+
+  <meta name="author" content="Andrew S Erwin" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+
+  <title><%= title %></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="<%= url %>" />
+  <meta property="og:site_name" content="<%= siteTitle %>" />
+  <meta property="og:title" content="<%= title %>" />
+  <meta
+    property="og:description"
+    content="Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools."
+  />
+  <meta property="og:image" content="<%= url %>/assets/social.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="<%= siteTitle %>" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@_andrewthecoder" />
+  <meta name="twitter:creator" content="@_andrewthecoder" />
+  <meta name="twitter:url" content="<%= url %>/" />
+  <meta name="twitter:title" content="<%= title %>" />
+  <meta
+    name="twitter:description"
+    content="Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools."
+  />
+  <meta name="twitter:image" content="<%= url %>/assets/social.png" />
+  <meta name="twitter:image:alt" content="<%= siteTitle %>" />
+
+  <link rel="stylesheet" href="/static/site.css" />
+</head>

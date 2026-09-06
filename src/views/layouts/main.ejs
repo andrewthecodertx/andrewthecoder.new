@@ -1,0 +1,19 @@
+<!-- constants -->
+<% 
+  const url = "https://andrewthecoder.com";
+  const siteTitle = "ANDREW THE CODER";
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/basehead', { url, siteTitle, pageTitle: typeof pageTitle
+  !== 'undefined' ? pageTitle : '' }) %>
+
+  <body>
+    <%- include('partials/header', { active: typeof active !=='undefined' ? active : '' }) %>
+
+    <main><%- body %></main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

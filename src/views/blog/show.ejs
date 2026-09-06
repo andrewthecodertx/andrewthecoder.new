@@ -1,0 +1,10 @@
+<%- extend('layouts/main') %>
+<article class="post">
+  <header>
+    <h1><%= post.meta.title %></h1>
+    <p class="post-meta"><%= post.meta.publishDate %> &middot; by <%= post.meta.author %></p>
+  </header>
+  <section class="prose">
+    <%- post.html %>
+  </section>
+</article>

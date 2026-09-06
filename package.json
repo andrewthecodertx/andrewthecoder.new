@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "dev": "bun src/dev.js",
+    "dev:watch": "bun src/dev.js",
+    "start": "NODE_ENV=production bun src/server.js"
+  },
+  "dependencies": {
+    "ejs": "^6.0.1",
+    "markdown-it": "^15.0.1",
+    "markdown-it-footnote": "^4.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6",
+    "prettier-plugin-ejs": "^1.0.3"
+  },
+  "prettier": {
+    "plugins": ["prettier-plugin-ejs"]
+  }
+}

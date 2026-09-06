@@ -1,0 +1,9 @@
+<%- extend('layouts/main') %>
+<h1>500 — internal error</h1>
+<p>Something went wrong on our end. <a href="/">Back to the home page</a>.</p>
+
+<% if (typeof error !== 'undefined' && error) { %>
+<pre class="error-details"><code><%= error.message %><% if (error.stack) { %>
+
+<%= error.stack %><% } %></code></pre>
+<% } %>

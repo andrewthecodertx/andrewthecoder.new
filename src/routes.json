@@ -1,0 +1,43 @@
+{
+  "routes": [
+    { "method": "GET", "path": "/", "controller": "home", "action": "index" },
+    {
+      "method": "GET",
+      "path": "/about",
+      "controller": "home",
+      "action": "about"
+    },
+    {
+      "method": "GET",
+      "path": "/challenges",
+      "controller": "home",
+      "action": "challenges"
+    },
+
+    {
+      "method": "GET",
+      "path": "/blog",
+      "controller": "blog",
+      "action": "index"
+    },
+    {
+      "method": "GET",
+      "path": "/blog/:slug",
+      "controller": "blog",
+      "action": "show"
+    },
+
+    {
+      "method": "GET",
+      "path": "/demos",
+      "controller": "software",
+      "action": "demos"
+    },
+    {
+      "method": "GET",
+      "path": "/projects",
+      "controller": "software",
+      "action": "projects"
+    }
+  ]
+}
