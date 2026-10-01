@@ -13,6 +13,28 @@ function safeDecode(value) {
   }
 }
 
+// Route matching runs against the RAW pathname, but params are decoded
+// afterwards. That ordering is a privilege change: the compiled pattern
+// ([^/]+) guarantees a named param contains no "/" *at match time*, yet
+// "%2f" is not a slash then and becomes one after decodeURIComponent. A
+// request for /blog/..%2f..%2fetc therefore matches /blog/:slug and then
+// hands the handler "../../etc" -- a value the pattern would never have
+// allowed. Downstream sinks (filesystem joins especially) must not be the
+// only thing standing between the URL and a traversal.
+//
+// A named param is by definition ONE path segment, so a decoded value that
+// contains a separator (or a NUL/control byte, or a "." / ".." segment) is
+// malformed and gets a clean 404 rather than being passed to the handler.
+// "*" wildcards are exempt: capturing across "/" is their entire purpose.
+function isValidSegmentParam(value) {
+  if (value === undefined) return true;
+  if (value.includes("/") || value.includes("\\")) return false;
+  if (value === "." || value === "..") return false;
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f]/.test(value)) return false;
+  return true;
+}
+
 export class Router {
   constructor() {
     this.routes = []; // { method, regex, paramNames, handlers, raw }
@@ -208,10 +230,24 @@ export class Router {
 
         const { route, m } = matched;
 
+        let paramInvalid = false;
+
         route.paramNames.forEach((name, i) => {
-          req.params[name] =
-            m[i + 1] !== undefined ? safeDecode(m[i + 1]) : undefined;
+          const raw = m[i + 1] !== undefined ? m[i + 1] : undefined;
+          const value = raw !== undefined ? safeDecode(raw) : undefined;
+
+          // Enforce the segment invariant the pattern promised, now that the
+          // value is decoded. Wildcards legitimately span "/".
+          if (name !== "wildcard" && !isValidSegmentParam(value)) {
+            paramInvalid = true;
+          }
+
+          req.params[name] = value;
         });
+
+        if (paramInvalid) {
+          return this.notFoundHandler(req, res);
+        }
 
         // Route/group middleware — runs only for the matched route.
         for (const mw of route.middleware || []) {

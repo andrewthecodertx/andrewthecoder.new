@@ -35,7 +35,7 @@ export class BaseController {
   // images that only exist on the production site.
   assetExists(sitePath) {
     if (!sitePath || !sitePath.startsWith("/")) return false;
-    const file = path.join(PUBLIC_ROOT, sitePath.replace(/^\/+/, ""));
+    let file = path.join(PUBLIC_ROOT, sitePath.replace(/^\/+/, ""));
 
     try {
       return fs.statSync(file).isFile();

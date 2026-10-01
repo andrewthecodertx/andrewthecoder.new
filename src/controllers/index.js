@@ -10,7 +10,8 @@ import { BlogController } from "./BlogController.js";
 import { SoftwareController } from "./SoftwareController.js";
 
 export function loadControllers(ctx) {
-  const controllers = {};
+  let controllers = {};
+
   for (const [name, Ctor] of Object.entries({
     home: HomeController,
     blog: BlogController,
