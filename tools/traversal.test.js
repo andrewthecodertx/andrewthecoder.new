@@ -17,13 +17,10 @@ function paramFromRequest(url) {
   const router = new Router();
   let seen = null;
 
-  router.get(
-    "/blog/:slug",
-    (req, res) => {
-      seen = req.params.slug;
-      return res.status(200).json({ ok: true });
-    },
-  );
+  router.get("/blog/:slug", (req, res) => {
+    seen = req.params.slug;
+    return res.status(200).json({ ok: true });
+  });
   router.notFound((req, res) => res.status(404).json({ error: "Not Found" }));
 
   return router
@@ -69,11 +66,52 @@ test("router: wildcards may still capture across /", async () => {
   });
   router.notFound((req, res) => res.status(404).json({ error: "Not Found" }));
 
-  const res = await router
-    .handler()(new Request("http://x/files/a/b/c.txt"), { port: 0 });
+  const res = await router.handler()(new Request("http://x/files/a/b/c.txt"), {
+    port: 0,
+  });
 
   expect(res.status).toBe(200);
   expect(seen).toBe("a/b/c.txt");
+});
+
+// The test above passes whether the route is protected by a decode-first
+// matcher or by a guard applied AFTER decoding, so it cannot tell the ordering
+// fix from a mitigation layered on top of the flaw. This one can.
+//
+// A route pattern containing a character that must be percent-encoded on the
+// wire is the discriminating case. Decode the pathname once and match the
+// decoded value -> "/a%20b" matches "/a b" and returns 200. Match the raw wire
+// bytes and the encoded pattern can never match -> 404. No post-decode guard
+// can produce 200 here, because the route is never selected at all, so passing
+// this test proves the fix is at the MATCHING layer rather than layered over it.
+test("router: matching runs on the decoded pathname, not the raw wire bytes", async () => {
+  const router = new Router();
+
+  router.get("/a b", (req, res) => res.status(200).json({ ok: true }));
+  router.notFound((req, res) => res.status(404).json({ error: "Not Found" }));
+
+  const handler = router.handler();
+
+  // The pattern is "/a b"; only the encoded form can ever reach it over HTTP.
+  const encoded = await handler(new Request("http://x/a%20b"), { port: 0 });
+  expect(encoded.status).toBe(200);
+
+  // The decoded pathname is "/a b" -- which is now TWO segments as far as the
+  // route pattern is concerned, so a smuggled segment fails to match outright.
+  const smuggled = await handler(new Request("http://x/a%20b/extra"), {
+    port: 0,
+  });
+  expect(smuggled.status).toBe(404);
+});
+
+// Root cause seen from the param side: a param is decoded exactly once. With a
+// match-raw / decode-later router, "%252f" survives that single decode and the
+// handler receives it still encoded -- a value the pattern never promised, and
+// one a downstream double-decode would turn back into a slash.
+test("router: a param is decoded exactly once, not twice", async () => {
+  const { status, slug } = await paramFromRequest("http://x/blog/a%252fb");
+  expect(slug).toBe("a%2fb");
+  expect(status).toBe(200);
 });
 
 // --- layer 2: the markdown sink -------------------------------------------
@@ -100,7 +138,17 @@ test("sink: traversal slugs resolve to nothing outside BLOG_ROOT", () => {
 });
 
 test("sink: non-string and hostile slugs are rejected", () => {
-  for (const bad of [null, undefined, 0, {}, [], true, "a\x00b", "a\nb", " post "]) {
+  for (const bad of [
+    null,
+    undefined,
+    0,
+    {},
+    [],
+    true,
+    "a\x00b",
+    "a\nb",
+    " post ",
+  ]) {
     expect(loadPost(bad)).toBeNull();
   }
 });
@@ -116,13 +164,7 @@ test("sink: a symlink inside BLOG_ROOT cannot read content from outside it", () 
   const BLOG_ROOT = path.resolve(import.meta.dir, "../src/content/blog");
   const slug = "zz-tmp-symlink";
   const linkPath = path.join(BLOG_ROOT, `${slug}.md`);
-  const outside = path.join(
-    BLOG_ROOT,
-    "..",
-    "..",
-    "..",
-    "zz-tmp-secret.md",
-  );
+  const outside = path.join(BLOG_ROOT, "..", "..", "..", "zz-tmp-secret.md");
 
   // Clean any residue from a previously aborted run before creating fixtures,
   // so a red run cannot cascade into EEXIST noise.

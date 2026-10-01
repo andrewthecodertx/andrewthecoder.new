@@ -10,7 +10,7 @@ import { config } from "./config.js";
 const SRV_ROOT = import.meta.dir;
 const PUBLIC_ROOT = path.resolve(SRV_ROOT, "../public");
 
-let app = {
+const app = {
   view: makeView(undefined, markdown),
   markdown,
   controllers: {},
@@ -19,7 +19,7 @@ let app = {
 // Build controllers sharing a single view+markdown context
 app.controllers = loadControllers(app);
 
-let router = new Router();
+const router = new Router();
 
 // Global middleware — log every request (dev only) + expose the view renderer
 router.use((req) => {
@@ -31,7 +31,7 @@ router.use((req) => {
 });
 
 // Load routes.json and register against controllers
-let routes = JSON.parse(
+const routes = JSON.parse(
   fs.readFileSync(path.join(SRV_ROOT, "routes.json"), "utf8"),
 ).routes;
 
@@ -67,8 +67,8 @@ Bun.serve({
   hostname: config.host,
 
   fetch: async (req) => {
-    let url = new URL(req.url);
-    let staticRes = url.pathname.startsWith("/static/")
+    const url = new URL(req.url);
+    const staticRes = url.pathname.startsWith("/static/")
       ? await serveStatic(req, PUBLIC_ROOT)
       : null;
 
@@ -76,7 +76,7 @@ Bun.serve({
       return staticRes;
     }
 
-    let handler = router.handler();
+    const handler = router.handler();
 
     return handler(req, null);
   },

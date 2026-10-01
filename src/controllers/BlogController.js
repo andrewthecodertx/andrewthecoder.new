@@ -6,9 +6,9 @@ export class BlogController extends BaseController {
   }
 
   index(req, res) {
-    let posts = this.loadBlogPosts();
+    const posts = this.loadBlogPosts();
 
-    let raw = posts.reduce((acc, post) => {
+    const raw = posts.reduce((acc, post) => {
       const cats = post.meta.categories || ["Uncategorized"];
       cats.forEach((cat) => {
         if (!acc[cat]) acc[cat] = [];
@@ -18,7 +18,7 @@ export class BlogController extends BaseController {
     }, {});
 
     // Stable category order: known categories first by rank, then alphabetical.
-    let categoryOrder = {
+    const categoryOrder = {
       "Software Development": 1,
       Tutorials: 2,
       "Artificial Intelligence": 3,
@@ -27,7 +27,7 @@ export class BlogController extends BaseController {
       Poetry: 6,
     };
 
-    let postsByCategory = Object.fromEntries(
+    const postsByCategory = Object.fromEntries(
       Object.keys(raw)
         .sort((a, b) => {
           const ra = categoryOrder[a] ?? 999;
@@ -47,7 +47,7 @@ export class BlogController extends BaseController {
   }
 
   show(req, res) {
-    let post = this.ctx.markdown.loadPost(req.params.slug);
+    const post = this.ctx.markdown.loadPost(req.params.slug);
 
     if (!post) {
       return res.status(404).render("errors/404", {
@@ -56,7 +56,7 @@ export class BlogController extends BaseController {
       });
     }
 
-    let image = post.meta.image;
+    const image = post.meta.image;
 
     return res.render("blog/show", {
       pageTitle: post.meta.title || req.params.slug,

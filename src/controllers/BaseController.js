@@ -23,7 +23,7 @@ export class BaseController {
   }
 
   loadDemos(n = 0) {
-    let demos = JSON.parse(
+    const demos = JSON.parse(
       fs.readFileSync(path.join(DATA_ROOT, "demos.json"), "utf8"),
     ).demos;
 
@@ -35,7 +35,7 @@ export class BaseController {
   // images that only exist on the production site.
   assetExists(sitePath) {
     if (!sitePath || !sitePath.startsWith("/")) return false;
-    let file = path.join(PUBLIC_ROOT, sitePath.replace(/^\/+/, ""));
+    const file = path.join(PUBLIC_ROOT, sitePath.replace(/^\/+/, ""));
 
     try {
       return fs.statSync(file).isFile();

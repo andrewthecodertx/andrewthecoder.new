@@ -2,30 +2,14 @@ import { prepareRequest, makeResponseHelpers } from "./http.js";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
-// A malformed percent sequence (e.g. "/blog/%zz") makes decodeURIComponent
-// throw URIError, which would surface as a 500 instead of a 404. On failure we
-// keep the raw segment: it then simply fails the downstream lookup.
-function safeDecode(value) {
+function decodePathname(pathname) {
   try {
-    return decodeURIComponent(value);
+    return decodeURIComponent(pathname);
   } catch {
-    return value;
+    return null;
   }
 }
 
-// Route matching runs against the RAW pathname, but params are decoded
-// afterwards. That ordering is a privilege change: the compiled pattern
-// ([^/]+) guarantees a named param contains no "/" *at match time*, yet
-// "%2f" is not a slash then and becomes one after decodeURIComponent. A
-// request for /blog/..%2f..%2fetc therefore matches /blog/:slug and then
-// hands the handler "../../etc" -- a value the pattern would never have
-// allowed. Downstream sinks (filesystem joins especially) must not be the
-// only thing standing between the URL and a traversal.
-//
-// A named param is by definition ONE path segment, so a decoded value that
-// contains a separator (or a NUL/control byte, or a "." / ".." segment) is
-// malformed and gets a clean 404 rather than being passed to the handler.
-// "*" wildcards are exempt: capturing across "/" is their entire purpose.
 function isValidSegmentParam(value) {
   if (value === undefined) return true;
   if (value.includes("/") || value.includes("\\")) return false;
@@ -63,9 +47,6 @@ export class Router {
     for (const route of sub.routes) {
       const raw = base + route.raw;
       const { regex, paramNames } = this.compileRoute(raw);
-
-      // Group middleware runs before this route's own handlers (scoped to
-      // the group — it is NOT appended to the top-level middleware list).
       const middleware = [...sub.middleware, ...(route.middleware || [])];
 
       this.routes.push({ ...route, raw, regex, paramNames, middleware });
@@ -123,12 +104,6 @@ export class Router {
     return this;
   }
 
-  /**
-   * Register routes from a config array (see routes.json) against controllers.
-   * Each entry: { method, path, controller, action }.
-   * controllers maps a name -> an instance (or class to resolve lazily).
-   * Controllers receive a render fn via res.render('view', locals).
-   */
   register(routes, controllers) {
     for (const r of routes) {
       const method = (r.method || "GET").toUpperCase();
@@ -187,6 +162,13 @@ export class Router {
       const method = bunReq.method.toUpperCase();
       const req = prepareRequest(bunReq, server);
       const res = makeResponseHelpers();
+      const pathname = decodePathname(url.pathname);
+
+      if (pathname === null) {
+        return this.notFoundHandler(req, res);
+      }
+
+      req.path = pathname;
 
       try {
         for (const mw of this.middleware) {
@@ -198,10 +180,10 @@ export class Router {
         }
 
         let matched = null;
-        let allowedMethods = new Set();
+        const allowedMethods = new Set();
 
         for (const route of this.routes) {
-          const m = route.regex.exec(url.pathname);
+          const m = route.regex.exec(pathname);
 
           if (m) {
             allowedMethods.add(route.method);
@@ -218,7 +200,7 @@ export class Router {
             return res
               .status(405)
               .header("Allow", [...allowedMethods].join(", "))
-              .json({ error: "Method Not Allowed", path: url.pathname });
+              .json({ error: "Method Not Allowed", path: pathname });
           }
 
           const result = await this.notFoundHandler(req, res);
@@ -233,11 +215,10 @@ export class Router {
         let paramInvalid = false;
 
         route.paramNames.forEach((name, i) => {
-          const raw = m[i + 1] !== undefined ? m[i + 1] : undefined;
-          const value = raw !== undefined ? safeDecode(raw) : undefined;
+          const value = m[i + 1];
 
-          // Enforce the segment invariant the pattern promised, now that the
-          // value is decoded. Wildcards legitimately span "/".
+          // Values are already decoded; validating the segment shape here is
+          // what rejects the ones ([^/]+) still admits, e.g. "%2e%2e".
           if (name !== "wildcard" && !isValidSegmentParam(value)) {
             paramInvalid = true;
           }

@@ -6,9 +6,9 @@ export class HomeController extends BaseController {
   }
 
   index(req, res) {
-    let recentposts = this.loadBlogPosts(4, true);
-    let projects = this.loadProjects();
-    let demos = this.loadDemos(4);
+    const recentposts = this.loadBlogPosts(4, true);
+    const projects = this.loadProjects();
+    const demos = this.loadDemos(4);
 
     return res.render("home/index", {
       description: "Software developer with 25+ years building things.",

@@ -12,10 +12,10 @@ const SLOT_OPEN_RE = new RegExp(
 const SLOT_CLOSE_RE = new RegExp("<%[-=_/]?\\s*endslot\\s*%>");
 
 export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
-  let sink = { root: viewDir, views: [viewDir] };
-  let cache = new Map(); // file -> { layoutName, bodySource, slots }
-  let rawCache = new Map(); // layout file -> raw source
-  let hasMarkdown = markdown !== null;
+  const sink = { root: viewDir, views: [viewDir] };
+  const cache = new Map(); // file -> { layoutName, bodySource, slots }
+  const rawCache = new Map(); // layout file -> raw source
+  const hasMarkdown = markdown !== null;
 
   function optsFor() {
     return {
@@ -27,7 +27,10 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
   }
 
   function resolve(name) {
-    let file = path.join(viewDir, name.endsWith(".ejs") ? name : `${name}.ejs`);
+    const file = path.join(
+      viewDir,
+      name.endsWith(".ejs") ? name : `${name}.ejs`,
+    );
 
     if (!fs.existsSync(file)) {
       throw new Error(`View not found: ${name} (looked for ${file})`);
@@ -42,7 +45,7 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
    * extracted so they can be rendered separately into the layout.
    */
   function preprocess(name) {
-    let file = resolve(name);
+    const file = resolve(name);
 
     if (cache.has(file)) {
       return cache.get(file);
@@ -50,21 +53,21 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
 
     let src = fs.readFileSync(file, "utf8");
     let layoutName = null;
-    let ext = src.match(EXTEND_RE);
+    const ext = src.match(EXTEND_RE);
 
     if (ext) {
       layoutName = ext[2];
       src = src.slice(0, ext.index) + src.slice(ext.index + ext[0].length);
     }
 
-    let slots = [];
-    let openRe = new RegExp(SLOT_OPEN_RE.source, "g");
+    const slots = [];
+    const openRe = new RegExp(SLOT_OPEN_RE.source, "g");
     let match;
 
     while ((match = openRe.exec(src))) {
-      let name = match[2];
-      let openEnd = match.index + match[0].length;
-      let close = SLOT_CLOSE_RE.exec(src.slice(openEnd));
+      const name = match[2];
+      const openEnd = match.index + match[0].length;
+      const close = SLOT_CLOSE_RE.exec(src.slice(openEnd));
 
       if (!close) {
         throw new Error(
@@ -72,9 +75,9 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
         );
       }
 
-      let start = openEnd;
-      let end = openEnd + close.index;
-      let content = src.slice(start, end);
+      const start = openEnd;
+      const end = openEnd + close.index;
+      const content = src.slice(start, end);
 
       // remove the whole block from the body source
       src = src.slice(0, match.index) + src.slice(end + close[0].length);
@@ -82,7 +85,7 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
       openRe.lastIndex = match.index; // re-scan from the mutated position
     }
 
-    let t = { layoutName, bodySource: src, slots };
+    const t = { layoutName, bodySource: src, slots };
 
     cache.set(file, t);
 
@@ -90,15 +93,15 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
   }
 
   function renderName(name, data) {
-    let locals = { ...data };
-    let t = preprocess(name);
-    let layoutName =
+    const locals = { ...data };
+    const t = preprocess(name);
+    const layoutName =
       locals._layout === undefined ? (t.layoutName ?? null) : locals._layout;
 
     // Named slots render independently so the layout can place them.
-    let slots = {};
+    const slots = {};
 
-    for (let s of t.slots) {
+    for (const s of t.slots) {
       if (s.name in slots) {
         throw new Error(`View '${name}': duplicate slot '${s.name}'`);
       }
@@ -113,32 +116,32 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
         .replace(SLOT_OPEN_RE, "")
         .replace(SLOT_CLOSE_RE, "");
     }
-    let body = ejs.render(bodySource, locals, optsFor());
+    const body = ejs.render(bodySource, locals, optsFor());
 
     if (!layoutName) {
       return body;
     }
 
-    let layoutLocals = {
+    const layoutLocals = {
       ...locals,
       body,
       slots,
       slot: (n) => slots[n] || "",
     };
 
-    let layoutSrc = loadLayout(layoutName);
+    const layoutSrc = loadLayout(layoutName);
 
     return ejs.render(layoutSrc, layoutLocals, optsFor());
   }
 
   function loadLayout(name) {
-    let file = resolve(name);
+    const file = resolve(name);
 
     if (rawCache.has(file)) {
       return rawCache.get(file);
     }
 
-    let src = fs.readFileSync(file, "utf8");
+    const src = fs.readFileSync(file, "utf8");
 
     rawCache.set(file, src);
 
@@ -146,7 +149,7 @@ export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
   }
 
   // Shared renderer passed to controllers via res.render
-  let renderer = (name, data = {}) => {
+  const renderer = (name, data = {}) => {
     let locals = data;
     if (hasMarkdown && !data.formatDate) {
       locals = { formatDate: markdown.formatDate, ...data };

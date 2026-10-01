@@ -83,13 +83,18 @@ function resolveExistingPostFile(slug) {
   }
 
   try {
-    return fs.statSync(real).isFile() ? file : null;
+    // Hand back the RESOLVED path, not the constructed one. loadPost() then
+    // reads exactly what we validated, so replacing the original name with a
+    // symlink between the check and the read cannot redirect the read
+    // somewhere else (the existsSync()->readFileSync() pair this replaced had
+    // exactly that check-then-use window).
+    return fs.statSync(real).isFile() ? real : null;
   } catch {
     return null;
   }
 }
 
-let mdLib = md({
+const mdLib = md({
   // Raw HTML in post bodies is intentional — several posts ship hand-written
   // markup (e.g. building-weightogether.md uses <div> rows). Escaping it was
   // a content-integrity regression vs the Astro site.
@@ -101,19 +106,19 @@ let mdLib = md({
 function parseFrontmatter(raw) {
   if (!raw.startsWith("---")) return { meta: {}, body: raw };
 
-  let end = raw.indexOf("\n---", 4);
+  const end = raw.indexOf("\n---", 4);
 
   if (end === -1) return { meta: {}, body: raw };
 
-  let block = raw.slice(4, end);
-  let body = raw.slice(end + 4);
-  let meta = {};
+  const block = raw.slice(4, end);
+  const body = raw.slice(end + 4);
+  const meta = {};
 
-  for (let line of block.split("\n")) {
+  for (const line of block.split("\n")) {
     if (!line.includes(":")) continue;
 
-    let i = line.indexOf(":");
-    let key = line.slice(0, i).trim();
+    const i = line.indexOf(":");
+    const key = line.slice(0, i).trim();
     let val = line.slice(i + 1).trim();
     // strip a leading/trailing matching quote pair
     if (val.length >= 2 && val[0] === "'" && val[val.length - 1] === "'") {
@@ -139,9 +144,9 @@ function decodeFrontmatterValue(val) {
   if (val === "false") return false;
   if (/^-?\d+$/.test(val)) return Number(val);
 
-  let arrayMatch = val.match(/^\s*\[\s*(.*?)\s*\]\s*$/s);
+  const arrayMatch = val.match(/^\s*\[\s*(.*?)\s*\]\s*$/s);
   if (arrayMatch) {
-    let inner = arrayMatch[1];
+    const inner = arrayMatch[1];
     if (inner === "") return [];
     // Split on commas not nested in quotes (simple case: no nested brackets)
     return inner
@@ -161,14 +166,14 @@ export function loadPost(slug) {
     return null;
   }
 
-  let cached = BLOG_CACHE.get(slug);
-  let mtime = readMtime(file);
+  const cached = BLOG_CACHE.get(slug);
+  const mtime = readMtime(file);
 
   if (cached && cached.mtimeMs === mtime) {
     return cached.post;
   }
 
-  let post = renderPost(slug, fs.readFileSync(file, "utf8"));
+  const post = renderPost(slug, fs.readFileSync(file, "utf8"));
 
   BLOG_CACHE.set(slug, { post, mtimeMs: mtime });
 
@@ -176,7 +181,7 @@ export function loadPost(slug) {
 }
 
 function renderPost(slug, raw) {
-  let { meta, body } = parseFrontmatter(raw);
+  const { meta, body } = parseFrontmatter(raw);
 
   return {
     slug,
@@ -201,13 +206,13 @@ function readMtime(file) {
 // edits anyway, so this makes index renders ~O(1) instead of 22 file reads +
 // full markdown render per request.
 function loadBlogPostsCached(n, f) {
-  let names = fs.readdirSync(BLOG_ROOT).filter((fn) => fn.endsWith(".md"));
-  let mtimes = new Map();
+  const names = fs.readdirSync(BLOG_ROOT).filter((fn) => fn.endsWith(".md"));
+  const mtimes = new Map();
   let dirty = !BLOG_INDEX_CACHE;
 
-  for (let name of names) {
-    let slug = name.replace(/\.md$/, "");
-    let mtime = readMtime(path.join(BLOG_ROOT, name));
+  for (const name of names) {
+    const slug = name.replace(/\.md$/, "");
+    const mtime = readMtime(path.join(BLOG_ROOT, name));
 
     mtimes.set(slug, mtime);
 
@@ -222,9 +227,9 @@ function loadBlogPostsCached(n, f) {
   }
 
   if (dirty) {
-    let posts = names
+    const posts = names
       .map((name) => {
-        let slug = name.replace(/\.md$/, "");
+        const slug = name.replace(/\.md$/, "");
         return renderPost(
           slug,
           fs.readFileSync(path.join(BLOG_ROOT, name), "utf8"),
@@ -238,7 +243,7 @@ function loadBlogPostsCached(n, f) {
 
     BLOG_INDEX_CACHE = { posts, mtimes };
     // Keep the per-slug cache in sync so loadPost benefits from the same parse.
-    for (let p of posts) {
+    for (const p of posts) {
       BLOG_CACHE.set(p.slug, { post: p, mtimeMs: mtimes.get(p.slug) });
     }
   }
@@ -262,10 +267,10 @@ export function formatDate(iso) {
   if (!iso) return "";
 
   // Parse YYYY-MM-DD as LOCAL time to avoid UTC midnight shift in negative-UTC timezones
-  let match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
   if (match) {
-    let d = new Date(+match[1], +match[2] - 1, +match[3]);
+    const d = new Date(+match[1], +match[2] - 1, +match[3]);
     if (Number.isNaN(d.getTime())) return iso;
 
     return d.toLocaleDateString("en-US", {
@@ -276,12 +281,12 @@ export function formatDate(iso) {
   }
 
   // Parse YYYY-MM-DDTHH:MM[:SS] as LOCAL time as well.
-  let dtMatch = iso.match(
+  const dtMatch = iso.match(
     /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/,
   );
 
   if (dtMatch) {
-    let d = new Date(
+    const d = new Date(
       +dtMatch[1],
       +dtMatch[2] - 1,
       +dtMatch[3],

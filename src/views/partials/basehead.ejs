@@ -1,14 +1,14 @@
 <%
-    let title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
-    let desc = description
+    const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+    const desc = description
       ? description
       : "Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools.";
-    let image = pageImage
+    const image = pageImage
       ? pageImage.startsWith("http")
         ? pageImage
         : `${url}${pageImage}`
       : `${url}/assets/social.png`;
-    let canonical = pageUrl ? pageUrl : url;
+    const canonical = pageUrl ? pageUrl : url;
 %>
 <head>
   <meta charset="utf-8" />
