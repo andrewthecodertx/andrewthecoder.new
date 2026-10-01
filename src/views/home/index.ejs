@@ -1,123 +1,49 @@
 <%- extend('layouts/main') %>
-<main>
-  <section id="">
-    <div class="">
-      <p>
-        I have 25 years of experience shipping products. I started when I was
-        ten with a Commodore 64 and have been building things that actually work
-        ever since.
-      </p>
-      <p>
-        I studied theology and linguistics along the way, which shaped how I
-        think about systems: structure, meaning, and getting the details right.
-      </p>
-    </div>
-    <div class="">
-      <h3>Who is Andrew</h3>
-      <p>
-        I build full-stack web applications, ship developer tools and
-        frameworks, and research where AI actually earns its keep in software
-        development. Two decades of production code has left me comfortable
-        anywhere in the stack (frontend, backend, infrastructure) and unbothered
-        by whichever language or runtime a project actually needs.
-      </p>
-    </div>
-  </section>
+<h2>Welcome Aboard</h2>
+<section id=""></section>
 
-  <article class="">
-    <h3>More About Me</h3>
-    <p>
-      My first program was a chatbot. Not because I was ahead of my time —
-      because I'd just seen <em>WarGames</em> and wanted a computer that would
-      talk back. I was ten, it was a Commodore 64, and the "AI" was a handful of
-      canned responses in BASIC. To me it was a trick. To my friends and family,
-      watching over my shoulder, it was basically sentience. That's the moment
-      that hooked me: the magic of making a machine appear alive through code.
-    </p>
-    <p>
-      Twenty-five years into a professional career, I'm still chasing that
-      feeling. My path here wasn't conventional — I studied theology and
-      linguistics in college, not computer science. Parsing ancient texts and
-      dissecting the structure of language turned out to be surprisingly
-      relevant training for designing systems and debugging logic. The
-      analytical rigor transfers; one just happens to use Greek instead of
-      Python.
-    </p>
-    <p>
-      I don't have a favorite language or a stack I'm married to. I've shipped
-      production code in Rust, TypeScript, PHP, Go, Python, OCaml, and Assembly,
-      among others. What excites me is the problem, not the tooling — the
-      toolbox is broad because good problems rarely respect language boundaries.
-    </p>
-  </article>
+<article class=""></article>
 
-  <article class="">
-    <h3>Meet Tim the Enchanter</h3>
-    <p>
-      Remember that chatbot? The one that faked it? That was the warm-up act.
-      The machine you're reading right now is the real thing — it's called
-      <a href="/projects/enchanter">Enchanter</a>, and it's currently doing the
-      talking.
-    </p>
-    <p>
-      Tim is the AI agent that runs inside Enchanter — a single Rust binary, no
-      runtime, no Docker, no cloud. He reads my SOUL, remembers what I've told
-      him, and never stops learning my habits. He writes with me, refactors with
-      me, and once, in a genuinely weird moment, started helping fix the very
-      code he runs on. I wrote the whole story down in
-      <a href="/blog/enchanter-meets-itself">Enchanter Meets Itself</a>.
-    </p>
-    <p>
-      And yes — every post on this blog goes out through Enchanter's own
-      pipeline, from draft to image to deploy. I just do the interviews.
-    </p>
-  </article>
-</main>
-<aside>
-  <div class="">
-    <div id="">
-      <h3>Recent Posts</h3>
-      <nav class="nav" aria-label="Aside">
-        <ul class="nav__list">
-          <% recentposts.forEach((post) => { %>
-          <li class="nav__item">
-            <a class="nav__link" href="/blog/<%= post.slug %>"
-              ><%= post.meta.title %></a
-            >
-            <span class="post-date"
-              ><%= formatDate(post.meta.publishDate) %></span
-            >
-          </li>
-          <% }) %>
-          <li>all blogs <a href="/blog">-></a></li>
-        </ul>
-      </nav>
-    </div>
-    <div id="projects">
-      <h3>Some Projects</h3>
-      <nav>
-        <ul>
-          <% projects.forEach((project) => { %>
-          <li class="project-item">
-            <a href="<%= project.url %>"><%= project.name %></a>
-          </li>
-          <% }) %>
-          <li>all projects <a href="/projects">-></a></li>
-        </ul>
-      </nav>
-    </div>
-    <div id="demos">
-      <h3>Some Demos</h3>
-      <nav>
-        <ul>
-          <% demos.forEach((demo) => { %>
-          <li class="demo-item">
-            <a href="<%= demo.url %>"><%= demo.name %></a>
-          </li>
-          <% }) %>
-          <li>all demos <a href="/demos">-></a></li>
-        </ul>
-      </nav>
-    </div>
+<article class=""></article>
+
+<aside class="aside">
+  <header class="aside__header">
+    <h3>some things to see and do</h3>
+  </header>
+  <div id="latest_posts">
+    <h3>Recent Posts</h3>
+    <ul class="list">
+      <% recentposts.forEach((post) => { %>
+      <li class="list__item">
+        <a class="list__link" href="/blog/<%= post.slug %>"
+          ><%= post.meta.title %></a
+        >
+        <span class="post__date"><%= formatDate(post.meta.publishDate) %></span>
+      </li>
+      <% }) %>
+      <li>all blogs <a href="/blog">-></a></li>
+    </ul>
+  </div>
+  <div id="current_projects">
+    <h3>Current Projects</h3>
+    <ul class="list">
+      <% projects.forEach((project) => { %>
+      <li class="list__item">
+        <a class="list__link" href="<%= project.url %>"><%= project.name %></a>
+      </li>
+      <% }) %>
+      <li>all projects <a href="/projects">-></a></li>
+    </ul>
+  </div>
+  <div id="recent_demos">
+    <h3>Some Demos</h3>
+    <ul class="list">
+      <% demos.forEach((demo) => { %>
+      <li class="list__item">
+        <a class="list__link" href="<%= demo.url %>"><%= demo.name %></a>
+      </li>
+      <% }) %>
+      <li>all demos <a href="/demos">-></a></li>
+    </ul>
   </div>
 </aside>

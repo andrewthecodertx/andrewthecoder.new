@@ -11,8 +11,14 @@
   pageImage : '', pageUrl: typeof pageUrl !== 'undefined' ? pageUrl : '', }) %>
 
   <body>
-    <%- include('partials/header') %>
-    <%- body %>
-    <%- include('partials/footer') %>
+    <div id="page_wrapper">
+      <header id="page_header"><%- include('partials/header') %></header>
+      <main>
+        <%- body %>
+      </main>
+    </div>
+    <footer>
+      <%- include('partials/footer') %>
+    </footer>
   </body>
 </html>

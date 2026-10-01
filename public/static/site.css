@@ -20,16 +20,24 @@ ul {
   list-style-type: none;
 }
 
-#hero {}
+#page_header {}
 
-#hero__subtitle {}
+#title {}
+
+#subtitle {}
+
+#navigation {}
 
 .nav {}
-
-.nav__list {}
 
 .nav__item {}
 
 .nav__item--active {}
 
 .nav__link {}
+
+.list {}
+
+.list__item {}
+
+.list_link {}

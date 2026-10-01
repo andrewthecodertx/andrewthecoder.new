@@ -1,10 +1,30 @@
-<header>
-  <h1 id="hero">
+<%
+  let page = typeof active !== "undefined" ? active : "";
+
+  let navItems = [
+    { label: 'home', url: '/' },
+    { label: 'blog', url: '/blog' },
+    { label: 'projects', url: '/projects' },
+    { label: 'demos', url: '/demos' },
+  ];
+%>
+<section id="title">
+  <h1>
     <a href="/" aria-label="andrew the coder">andrew the coder</a>
   </h1>
-  <p id="hero__subtitle">
-    software engineer &middot; web developer &middot; ai researcher &middot and
+  <span id="subtitle">
+    software engineer &middot; web developer &middot; ai researcher &middot; and
     more
-  </p>
-  <%- include('partials/nav') %>
-</header>
+  </span>
+</section>
+<section id="navigation">
+  <nav class="nav" aria-label="Primary">
+    <% navItems.map((item) => { %>
+    <div
+      class="nav__item<%= page === item.label ? ' nav__item--active' : '' %>"
+    >
+      <a href="<%= item.url %>" class="nav__link"><%= item.label %></a>
+    </div>
+    <% }); %>
+  </nav>
+</section>
