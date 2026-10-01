@@ -1,6 +1,8 @@
-export class SoftwareController {
+import { BaseController } from "./BaseController.js";
+
+export class SoftwareController extends BaseController {
   constructor(ctx) {
-    this.ctx = ctx; // { view, markdown }
+    super(ctx);
   }
 
   demos(req, res) {
@@ -8,7 +10,7 @@ export class SoftwareController {
       pageTitle: "Demos",
       description: "Interactive demos and experiments.",
       active: "demos",
-      demos: this.demoList(),
+      demos: this.loadDemos(),
     });
   }
 
@@ -17,16 +19,58 @@ export class SoftwareController {
       pageTitle: "Projects",
       description: "Side projects.",
       active: "projects",
-      projects: this.projectList(),
+      projects: this.loadProjects(),
     });
   }
 
-  // Static for now; will read from a data file later.
-  demoList() {
-    return ["conway", "mandelbrot", "wordle", "sudoku", "enigma"];
+  demoShow(req, res) {
+    const slug = req.params.slug;
+    const demo = this.loadDemos().find((d) => slugFromUrl(d.url) === slug);
+
+    if (!demo) {
+      return res.status(404).render("software/not-found", {
+        pageTitle: "Demo not found",
+        active: "demos",
+        kind: "demo",
+      });
+    }
+
+    return res.render("software/show", {
+      pageTitle: demo.name,
+      description: `${demo.name} — ${demo.language} demo.`,
+      active: "demos",
+      item: { ...demo, slug },
+    });
   }
 
-  projectList() {
-    return ["arc", "enchanter", "erwinmvc", "imsai"];
+  projectShow(req, res) {
+    const slug = req.params.slug;
+    const project = this.loadProjects().find(
+      (p) => slugFromUrl(p.url) === slug,
+    );
+
+    if (!project) {
+      return res.status(404).render("software/not-found", {
+        pageTitle: "Project not found",
+        active: "projects",
+        kind: "project",
+      });
+    }
+
+    return res.render("software/show", {
+      pageTitle: project.name,
+      description:
+        project.description ||
+        `${project.name} — ${project.language} project.`,
+      active: "projects",
+      item: { ...project, slug },
+    });
   }
+}
+
+function slugFromUrl(url) {
+  if (!url) return "";
+  const parts = url.split("/");
+
+  return parts[parts.length - 1];
 }

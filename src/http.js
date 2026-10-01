@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import fs from "bun:fs";
+import path from "bun:path";
 
 export function parseQuery(search) {
   const out = {};
@@ -72,15 +72,36 @@ export function makeResponseHelpers() {
   return api;
 }
 
-export function serveStatic(bunReq, publicRoot) {
+export async function serveStatic(bunReq, publicRoot) {
   const url = new URL(bunReq.url);
-  let filePath = path.join(publicRoot, url.pathname);
+  let filePath;
+
+  // Defense-in-depth: reject any path segment containing ".." (Bun's URL
+  // normalizes dot segments, but a future code path that hand-builds a
+  // pathname could reintroduce traversal). Reject raw "%2e%2e" too.
+  if (
+    /\/(?:\.\.|%2e%2e)(?:\/|$)/i.test(url.pathname) ||
+    url.pathname.includes("..")
+  ) {
+    return null;
+  }
+
+  filePath = path.join(publicRoot, url.pathname);
 
   if (url.pathname === "/" || filePath.endsWith("/")) {
     filePath = path.join(publicRoot, "index.html");
   }
 
-  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  const f = Bun.file(filePath);
+  let st;
+
+  try {
+    st = await f.stat();
+  } catch {
+    return null;
+  }
+
+  if (!st.isFile()) {
     return null;
   }
 
@@ -89,12 +110,18 @@ export function serveStatic(bunReq, publicRoot) {
       ".html": "text/html",
       ".css": "text/css",
       ".js": "text/javascript",
+      ".mjs": "text/javascript",
+      ".json": "application/json",
       ".png": "image/png",
       ".webp": "image/webp",
       ".svg": "image/svg+xml",
+      ".ico": "image/x-icon",
+      ".txt": "text/plain; charset=utf-8",
+      ".xml": "application/xml",
+      ".woff": "font/woff",
+      ".woff2": "font/woff2",
+      ".ttf": "font/ttf",
     }[path.extname(filePath)] || "application/octet-stream";
 
-  const body = fs.readFileSync(filePath);
-
-  return new Response(body, { headers: { "Content-Type": type } });
+  return new Response(f, { headers: { "Content-Type": type } });
 }

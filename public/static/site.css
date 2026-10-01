@@ -1,0 +1,35 @@
+:root {
+  --black: #040403cc;
+  --cream: #ffffb3ff;
+  --ash-brown: #77685dff;
+  --verdigris: #1b998bff;
+  --periwinkle: #c4c6e7ff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: var(--black);
+}
+
+ul {
+  list-style-type: none;
+}
+
+#hero {}
+
+#hero__subtitle {}
+
+.nav {}
+
+.nav__list {}
+
+.nav__item {}
+
+.nav__item--active {}
+
+.nav__link {}

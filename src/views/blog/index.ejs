@@ -1,11 +1,17 @@
 <%- extend('layouts/main') %>
-<h1>Blog</h1>
+<h2>Blog</h2>
 <p>A running log on code, philosophy, and tools.</p>
-<ul class="post-list">
-  <% posts.forEach((post) => { %>
-  <li class="post-item">
-    <a href="/blog/<%= post.slug %>"><%= post.meta.title %></a>
-    <span class="post-date"><%= post.meta.publishDate %></span>
-  </li>
-  <% }) %>
-</ul>
+
+<% Object.entries(postsByCategory).forEach(([category, posts]) => { %>
+  <section class="blog-category">
+    <h3 class="category-title"><%= category %></h3>
+    <ul class="post-list">
+      <% posts.forEach((post) => { %>
+      <li class="post-item">
+        <a href="/blog/<%= post.slug %>"><%= post.meta.title %></a>
+        <span class="post-date"><%= formatDate(post.meta.publishDate) %></span>
+      </li>
+      <% }) %>
+    </ul>
+  </section>
+<% }); %>

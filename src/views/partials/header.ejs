@@ -1,15 +1,10 @@
 <header>
-  <h1><a class="brand" href="/">andrewthecoder</a></h1>
-  <nav class="nav">
-    <a href="/" class="<%= active === 'home' ? 'active' : '' %>">home</a>
-    <a href="/blog" class="<%= active === 'blog' ? 'active' : '' %>">blog</a>
-    <a href="/demos" class="<%= active === 'demos' ? 'active' : '' %>">demos</a>
-    <a href="/projects" class="<%= active === 'projects' ? 'active' : '' %>"
-      >projects</a
-    >
-    <a href="/challenges" class="<%= active === 'challenges' ? 'active' : '' %>"
-      >challenges</a
-    >
-    <a href="/about" class="<%= active === 'about' ? 'active' : '' %>">about</a>
-  </nav>
+  <h1 id="hero">
+    <a href="/" aria-label="andrew the coder">andrew the coder</a>
+  </h1>
+  <p id="hero__subtitle">
+    software engineer &middot; web developer &middot; ai researcher &middot and
+    more
+  </p>
+  <%- include('partials/nav') %>
 </header>

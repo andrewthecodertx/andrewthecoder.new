@@ -9,9 +9,8 @@
 //        restarts the child when any of them change.
 //
 // Usage: bun run dev   (or: bun src/dev.js)
-import { spawn } from "node:child_process";
-import fs from "node:fs";
-import path from "node:path";
+import fs from "bun:fs";
+import path from "bun:path";
 
 const ROOT = path.resolve(import.meta.dir, "..");
 // Watch these non-JS source locations (relative to ROOT). JS files are
@@ -24,17 +23,27 @@ let stopping = false; // true while WE are stopping the child (for restart/shutd
 
 function startServer() {
   stopping = false;
-  child = spawn(process.execPath, ["--watch", "src/server.js"], {
-    cwd: ROOT,
-    stdio: "inherit",
-    env: { ...process.env, NODE_ENV: "development" },
-  });
+  child = Bun.spawn(
+    [process.execPath, "--watch", "src/server.js"],
+    {
+      cwd: ROOT,
+      stdout: "inherit",
+      stderr: "inherit",
+      stdin: "inherit",
+      env: { ...process.env, NODE_ENV: "development" },
+    },
+  );
 
-  child.on("exit", (code, signal) => {
+  child.exited.then((code) => {
     // If the child died on its own (crash / Ctrl+C on the child), shut the
     // runner down rather than spawn a zombie. If WE killed it (restart or
     // shutdown), just clear the reference.
-    if (!stopping && signal) process.exit(0);
+    if (!stopping) {
+      if (code !== 0) {
+        console.error(`[dev] server exited unexpectedly with code ${code}`);
+      }
+      process.exit(0);
+    }
     child = null;
   });
 }

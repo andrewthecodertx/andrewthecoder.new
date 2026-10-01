@@ -1,5 +1,4 @@
-<!-- constants -->
-<% 
+<%
   const url = "https://andrewthecoder.com";
   const siteTitle = "ANDREW THE CODER";
 %>
@@ -7,13 +6,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <%- include('partials/basehead', { url, siteTitle, pageTitle: typeof pageTitle
-  !== 'undefined' ? pageTitle : '' }) %>
+  !== 'undefined' ? pageTitle : '', description: typeof description !==
+  'undefined' ? description : '', pageImage: typeof pageImage !== 'undefined' ?
+  pageImage : '', pageUrl: typeof pageUrl !== 'undefined' ? pageUrl : '', }) %>
 
   <body>
-    <%- include('partials/header', { active: typeof active !=='undefined' ? active : '' }) %>
-
-    <main><%- body %></main>
-
+    <%- include('partials/header') %>
+    <%- body %>
     <%- include('partials/footer') %>
   </body>
 </html>

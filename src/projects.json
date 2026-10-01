@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Enchanter",
+      "description": "A focused AI agent harness: single Rust binary, any OpenAI-compatible provider, zero runtime dependencies. It reads your SOUL, loads your memory, discovers your skills, and runs your MCP servers.",
+      "language": "Rust",
+      "url": "/projects/enchanter",
+      "github": "/enchanter",
+      "demo": null
+    },
+    {
+      "name": "ErwinMVC",
+      "description": "A lightweight, full-featured MVC framework for Node.js 20+ built with TypeScript. It gets you from zero to a working web application in seconds, with sensible defaults and optional features you can add as needed.",
+      "language": "TypeScript",
+      "url": "/projects/erwinmvc",
+      "github": "/erwinmvc",
+      "demo": null
+    },
+    {
+      "name": "ArcMVC",
+      "description": "A lightweight, modern PHP MVC framework. Small core, batteries included, built for PHP 8.4+. No hidden magic — request flow is traceable from entry point to response. Every subsystem is replaceable.",
+      "language": "PHP",
+      "url": "/projects/arcmvc",
+      "github": "/php-arcmvc",
+      "demo": null
+    },
+    {
+      "name": "Commodore PET Emulator",
+      "description": "A Commodore PET 4032 emulator written in Rust. Features MOS 6502 CPU emulation, BASIC 4.0 interpreter, keyboard input, .prg file loading, and authentic 40-column display.",
+      "language": "Rust",
+      "url": "/projects/commodore-pet",
+      "github": "/rust-pet-emulator",
+      "demo": null
+    }
+  ]
+}

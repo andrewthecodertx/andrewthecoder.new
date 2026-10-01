@@ -1,0 +1,44 @@
+{
+  "demos": [
+    {
+      "name": "Conway's Life",
+      "language": "JavaScript",
+      "url": "/demos/conway"
+    },
+    {
+      "name": "NES Emulator",
+      "language": "Go/WebAssembly",
+      "url": "/demos/nes"
+    },
+    {
+      "name": "Multi User Dungeon",
+      "language": "JavaScript",
+      "url": "/demos/dungeon"
+    },
+    {
+      "name": "Wordle",
+      "language": "JavaScript",
+      "url": "/demos/wordle"
+    },
+    {
+      "name": "Enigma M3 Machine",
+      "language": "JavaScript",
+      "url": "/demos/enigma"
+    },
+    {
+      "name": "Tetris",
+      "language": "JavaScript",
+      "url": "/demos/tetris"
+    },
+    {
+      "name": "Sudoku",
+      "language": "JavaScript",
+      "url": "/demos/sudoku"
+    },
+    {
+      "name": "Mandelbrot Viewer",
+      "language": "WebAssembly",
+      "url": "/demos/mandelbrot"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+<%- extend('layouts/main') %>
+<article class="detail">
+  <header>
+    <h1><%= item.name %></h1>
+    <% if (item.language) { %>
+    <p class="detail-meta"><%= item.language %></p>
+    <% } %>
+  </header>
+
+  <% if (item.description) { %>
+  <section class="detail-description">
+    <p><%= item.description %></p>
+  </section>
+  <% } %>
+
+  <p class="detail-actions">
+    <% if (item.demo && item.demo !== 'null' && item.demo !== '') { %>
+    <a class="demo-link" href="<%= item.demo %>">Try the demo</a>
+    <% } %>
+    <% if (item.github) { %>
+    <a class="github-link" href="https://github.com/andrewthecodertx<%= item.github %>"><%= item.name %> on GitHub</a>
+    <% } %>
+  </p>
+</article>

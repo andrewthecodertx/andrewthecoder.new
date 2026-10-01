@@ -1,5 +1,14 @@
 <%
-    const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+    let title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
+    let desc = description
+      ? description
+      : "Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools.";
+    let image = pageImage
+      ? pageImage.startsWith("http")
+        ? pageImage
+        : `${url}${pageImage}`
+      : `${url}/assets/social.png`;
+    let canonical = pageUrl ? pageUrl : url;
 %>
 <head>
   <meta charset="utf-8" />
@@ -10,17 +19,15 @@
   <meta name="robots" content="index, follow, max-image-preview:large" />
 
   <title><%= title %></title>
+  <link rel="canonical" href="<%= canonical %>" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="<%= url %>" />
+  <meta property="og:url" content="<%= canonical %>" />
   <meta property="og:site_name" content="<%= siteTitle %>" />
   <meta property="og:title" content="<%= title %>" />
-  <meta
-    property="og:description"
-    content="Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools."
-  />
-  <meta property="og:image" content="<%= url %>/assets/social.png" />
+  <meta property="og:description" content="<%= desc %>" />
+  <meta property="og:image" content="<%= image %>" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="<%= siteTitle %>" />
@@ -30,14 +37,12 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@_andrewthecoder" />
   <meta name="twitter:creator" content="@_andrewthecoder" />
-  <meta name="twitter:url" content="<%= url %>/" />
+  <meta name="twitter:url" content="<%= canonical %>" />
   <meta name="twitter:title" content="<%= title %>" />
-  <meta
-    name="twitter:description"
-    content="Software developer with 25+ years building things. Available for freelance and contract work. Side projects, demos, and writing on code, philosophy, and tools."
-  />
-  <meta name="twitter:image" content="<%= url %>/assets/social.png" />
+  <meta name="twitter:description" content="<%= desc %>" />
+  <meta name="twitter:image" content="<%= image %>" />
   <meta name="twitter:image:alt" content="<%= siteTitle %>" />
 
   <link rel="stylesheet" href="/static/site.css" />
+  <script src="/static/main.js" defer></script>
 </head>

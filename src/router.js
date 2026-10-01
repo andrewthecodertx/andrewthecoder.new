@@ -1,33 +1,17 @@
-/**
- * router.js — a minimal, dependency-free HTTP router for Bun.
- *
- * Features:
- *  - Method-based routing (get/post/put/patch/delete/head/options/all)
- *  - Path params:      /users/:id
- *  - Optional params:  /users/:id?
- *  - Wildcards:        /files/*  (captured as req.params.wildcard)
- *  - Middleware:       router.use(fn) — global, or per-route via extra args
- *  - Route groups:     router.group('/api', r => { r.get('/health', ...) })
- *  - Query string parsing (req.query)
- *  - JSON body helper (req.json()), already native via Bun's Request
- *  - res helpers: json(), text(), html(), redirect(), status()
- *  - 404 / 405 / error handlers you can override
- *  - Zero dependencies — just Bun.serve
- *
- * Usage:
- *   import { Router } from './router.js';
- *   const router = new Router();
- *
- *   router.use((req) => { console.log(req.method, req.path); });
- *
- *   router.get('/', (req, res) => res.text('hello'));
- *   router.get('/users/:id', (req, res) => res.json({ id: req.params.id }));
- *
- *   Bun.serve({ port: 3000, fetch: router.handler() });
- */
 import { prepareRequest, makeResponseHelpers } from "./http.js";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
+
+// A malformed percent sequence (e.g. "/blog/%zz") makes decodeURIComponent
+// throw URIError, which would surface as a 500 instead of a 404. On failure we
+// keep the raw segment: it then simply fails the downstream lookup.
+function safeDecode(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
 
 export class Router {
   constructor() {
@@ -71,7 +55,14 @@ export class Router {
   _add(method, path, handlers) {
     const { regex, paramNames } = this.compileRoute(path);
 
-    this.routes.push({ method, regex, paramNames, handlers, middleware: [], raw: path });
+    this.routes.push({
+      method,
+      regex,
+      paramNames,
+      handlers,
+      middleware: [],
+      raw: path,
+    });
 
     return this;
   }
@@ -184,7 +175,6 @@ export class Router {
           }
         }
 
-        const candidates = this.routes.filter((r) => r.method === method);
         let matched = null;
         let allowedMethods = new Set();
 
@@ -220,7 +210,7 @@ export class Router {
 
         route.paramNames.forEach((name, i) => {
           req.params[name] =
-            m[i + 1] !== undefined ? decodeURIComponent(m[i + 1]) : undefined;
+            m[i + 1] !== undefined ? safeDecode(m[i + 1]) : undefined;
         });
 
         // Route/group middleware — runs only for the matched route.

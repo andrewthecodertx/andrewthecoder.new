@@ -1,0 +1,17 @@
+<%
+  let page = typeof active !== "undefined" ? active : "";
+
+  let navItems = [
+    { label: 'home', url: '/' },
+    { label: 'blog', url: '/blog' },
+    { label: 'projects', url: '/projects' },
+    { label: 'demos', url: '/demos' },
+  ];
+%>
+<nav class="nav" aria-label="Primary">
+  <% navItems.map((item) => { %>
+  <div class="nav__item<%= page === item.label ? ' nav__item--active' : '' %>">
+    <a href="<%= item.url %>" class="nav__link"><%= item.label %></a>
+  </div>
+  <% }); %>
+</nav>

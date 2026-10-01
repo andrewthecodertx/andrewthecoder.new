@@ -1,0 +1,4 @@
+<%- extend('layouts/main') %>
+<h1><%= kind === 'demo' ? 'Demo not found' : 'Project not found' %></h1>
+<p>We couldn't find that <%= kind %>.</p>
+<p><a href="/<%= kind === 'demo' ? 'demos' : 'projects' %>">Back to <%= kind === 'demo' ? 'demos' : 'projects' %></a></p>

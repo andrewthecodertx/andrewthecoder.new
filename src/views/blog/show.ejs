@@ -2,8 +2,11 @@
 <article class="post">
   <header>
     <h1><%= post.meta.title %></h1>
-    <p class="post-meta"><%= post.meta.publishDate %> &middot; by <%= post.meta.author %></p>
+    <p class="post-meta"><%= formatDate(post.meta.publishDate) %> &middot; by <%= post.meta.author %></p>
   </header>
+  <% if (typeof hasImage !== 'undefined' && hasImage && post.meta.image) { %>
+  <img class="post-image" src="<%= post.meta.image %>" alt="<%= post.meta.title %>" width="1200" height="630" />
+  <% } %>
   <section class="prose">
     <%- post.html %>
   </section>

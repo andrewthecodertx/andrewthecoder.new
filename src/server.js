@@ -1,5 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
+import fs from "bun:fs";
+import path from "bun:path";
 import { Router } from "./router.js";
 import { makeView } from "./lib/view.js";
 import * as markdown from "./lib/markdown.js";
@@ -11,7 +11,7 @@ const SRV_ROOT = import.meta.dir;
 const PUBLIC_ROOT = path.resolve(SRV_ROOT, "../public");
 
 let app = {
-  view: makeView(),
+  view: makeView(undefined, markdown),
   markdown,
   controllers: {},
 };
@@ -38,8 +38,8 @@ let routes = JSON.parse(
 router.register(routes, app.controllers);
 
 // 404
-router.notFound((req, res) => {
-  const staticRes = serveStatic(req, PUBLIC_ROOT);
+router.notFound(async (req, res) => {
+  const staticRes = await serveStatic(req, PUBLIC_ROOT);
 
   if (staticRes) {
     return staticRes;
@@ -47,21 +47,19 @@ router.notFound((req, res) => {
 
   return res
     .status(404)
-    .html(app.view.render("errors/404", { pageTitle: "Not found" }));
+    .html(app.view.render("errors/404", { pageTitle: "Resource Not found" }));
 });
 
 // Error handler
 router.onError((err, req, res) => {
   console.error("Unhandled error:", err.message);
 
-  return res
-    .status(500)
-    .html(
-      app.view.render("errors/500", {
-        pageTitle: "Internal error",
-        error: config.isDev ? { message: err.message, stack: err.stack } : null,
-      }),
-    );
+  return res.status(500).html(
+    app.view.render("errors/500", {
+      pageTitle: "Internal error",
+      error: config.isDev ? { message: err.message, stack: err.stack } : null,
+    }),
+  );
 });
 
 Bun.serve({
@@ -71,7 +69,7 @@ Bun.serve({
   fetch: async (req) => {
     let url = new URL(req.url);
     let staticRes = url.pathname.startsWith("/static/")
-      ? serveStatic(req, PUBLIC_ROOT)
+      ? await serveStatic(req, PUBLIC_ROOT)
       : null;
 
     if (staticRes) {
@@ -84,6 +82,8 @@ Bun.serve({
   },
 });
 
-console.log(`Andrew the Coder MVC listening on http://${config.host}:${config.port}`);
+console.log(
+  `Andrew the Coder MVC listening on http://${config.host}:${config.port}`,
+);
 console.log(`Routes registered: ${routes.length}`);
 console.log(`Mode: ${config.isDev ? "development" : "production"}`);

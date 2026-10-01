@@ -1,7 +1,10 @@
 <%- extend('layouts/main') %>
-<h1>Demos</h1>
+<h2>Demos</h2>
 <ul class="grid">
   <% demos.forEach((demo) => { %>
-  <li><a href="/demos/<%= demo %>"><%= demo %></a></li>
+  <li class="demo-item">
+    <a href="/demos/<%= demo.url.split('/').pop() %>"><%= demo.name %></a>
+    <span class="demo-language"><%= demo.language %></span>
+  </li>
   <% }) %>
 </ul>

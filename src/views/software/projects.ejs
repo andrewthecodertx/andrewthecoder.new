@@ -1,7 +1,15 @@
 <%- extend('layouts/main') %>
-<h1>Projects</h1>
+<h2>Projects</h2>
 <ul class="grid">
   <% projects.forEach((project) => { %>
-  <li><a href="/projects/<%= project %>"><%= project %></a></li>
+  <li class="project-item">
+    <a href="/projects/<%= project.url.split('/').pop() %>"><%= project.name %></a>
+    <% if (project.language) { %>
+    <span class="project-language"><%= project.language %></span>
+    <% } %>
+    <% if (project.description) { %>
+    <p class="project-description"><%= project.description %></p>
+    <% } %>
+  </li>
   <% }) %>
 </ul>

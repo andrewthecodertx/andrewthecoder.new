@@ -3,17 +3,10 @@
     { "method": "GET", "path": "/", "controller": "home", "action": "index" },
     {
       "method": "GET",
-      "path": "/about",
-      "controller": "home",
-      "action": "about"
-    },
-    {
-      "method": "GET",
       "path": "/challenges",
       "controller": "home",
       "action": "challenges"
     },
-
     {
       "method": "GET",
       "path": "/blog",
@@ -22,11 +15,16 @@
     },
     {
       "method": "GET",
+      "path": "/playground",
+      "controller": "home",
+      "action": "playground"
+    },
+    {
+      "method": "GET",
       "path": "/blog/:slug",
       "controller": "blog",
       "action": "show"
     },
-
     {
       "method": "GET",
       "path": "/demos",
@@ -35,9 +33,21 @@
     },
     {
       "method": "GET",
+      "path": "/demos/:slug",
+      "controller": "software",
+      "action": "demoShow"
+    },
+    {
+      "method": "GET",
       "path": "/projects",
       "controller": "software",
       "action": "projects"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/:slug",
+      "controller": "software",
+      "action": "projectShow"
     }
   ]
 }

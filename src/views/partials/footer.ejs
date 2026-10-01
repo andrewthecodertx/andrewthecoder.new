@@ -1,3 +1,29 @@
-<footer class="footer">
-  <p>Built by Andrew Erwin &copy; <%= new Date().getFullYear() %> &middot; <a href="/about">about</a></p>
+<%
+  // Error pages (404/500) render through this footer too and don't set
+  // `active` — never let a missing cosmetic local take down an error page.
+  const page = typeof active !== "undefined" ? active : "";
+%>
+<footer>
+  <a href="/" title="home" class="<%= page === 'home' ? 'active' : '' %>"
+    >home</a
+  >
+  <a
+    href="/blog"
+    title="the blogs!"
+    class="<%= page === 'blog' ? 'active' : '' %>"
+    >blog</a
+  >
+  <a
+    href="/projects"
+    title="the projects!"
+    class="<%= page === 'projects' ? 'active' : '' %>"
+    >projects</a
+  >
+  <a
+    href="/demos"
+    title="the demos!"
+    class="<%= page === 'demos' ? 'active' : '' %>"
+    >demos</a
+  >
+  <p>Built by Andrew S Erwin &copy; <%= new Date().getFullYear() %></p>
 </footer>

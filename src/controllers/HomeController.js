@@ -1,20 +1,21 @@
-export class HomeController {
+import { BaseController } from "./BaseController.js";
+
+export class HomeController extends BaseController {
   constructor(ctx) {
-    this.ctx = ctx; // { view, markdown }
+    super(ctx);
   }
 
   index(req, res) {
+    let recentposts = this.loadBlogPosts(4, true);
+    let projects = this.loadProjects();
+    let demos = this.loadDemos(4);
+
     return res.render("home/index", {
       description: "Software developer with 25+ years building things.",
       active: "home",
-    });
-  }
-
-  about(req, res) {
-    return res.render("home/about", {
-      pageTitle: "About",
-      description: "About Andrew Erwin.",
-      active: "about",
+      recentposts: recentposts,
+      projects: projects,
+      demos: demos,
     });
   }
 
@@ -23,6 +24,14 @@ export class HomeController {
       pageTitle: "Challenges",
       description: "Coding challenges and solutions.",
       active: "challenges",
+    });
+  }
+
+  playground(req, res) {
+    return res.render("home/playground", {
+      pageTitle: "Playground",
+      description: "Scratchpad for new ideas.",
+      active: "playground",
     });
   }
 }

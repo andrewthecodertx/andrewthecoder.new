@@ -1,37 +1,6 @@
-/**
- * view.js — EJS renderer with a layout system + named slots for Bun.
- *
- * A controller action calls:
- *   return res.render('home/index', { title: '...', active: 'home' })
- *
- * Templates live under views/, named views/<name>.ejs. The action's template
- * declares its own shell via a directive at the top:
- *
- *   <%- extend('layouts/base') %>        <- shell (alias: layout('...'))
- *   <%- slot('header') %>...<%/ endslot %>  <- named region the view fills
- *
- * The layout then renders those regions:
- *   <%- slot('header') %>   <- named slot ('' if the view didn't fill it)
- *   <%- body %>             <- the view's remaining output (back ward compat)
- *
- * Resolution order for the shell:
- *   1. <%- extend(...) %> in the view (explicit)
- *   2. locals._ayout (controller override), false = raw
- *   3. NO explicit layout directive AND no _ayout -> RAW output (no default)
- *
- * So a standalone page just doesn't extend, and it renders as bare HTML.
- *
- * Tag rules:
- *   - Exactly zero or one extend/layout directive; must appear before slots.
- *   - Slots are flat (no nesting). Duplicate slot names throw.
- *   - If the view renders WITHOUT a layout, slot tags are dropped and their
- *     content is kept inline — the view is just raw HTML (no shell).
- *
- * EJS v6: use ejs.render(str, data, opts) — do NOT construct EJS directly.
- */
 import ejs from "ejs";
-import path from "node:path";
-import fs from "node:fs";
+import path from "bun:path";
+import fs from "bun:fs";
 
 const VIEWS_ROOT = path.resolve(import.meta.dir, "../views");
 const EXTEND_RE = new RegExp(
@@ -42,10 +11,11 @@ const SLOT_OPEN_RE = new RegExp(
 );
 const SLOT_CLOSE_RE = new RegExp("<%[-=_/]?\\s*endslot\\s*%>");
 
-export function makeView(viewDir = VIEWS_ROOT) {
+export function makeView(viewDir = VIEWS_ROOT, markdown = null) {
   let sink = { root: viewDir, views: [viewDir] };
   let cache = new Map(); // file -> { layoutName, bodySource, slots }
   let rawCache = new Map(); // layout file -> raw source
+  let hasMarkdown = markdown !== null;
 
   function optsFor() {
     return {
@@ -123,7 +93,7 @@ export function makeView(viewDir = VIEWS_ROOT) {
     let locals = { ...data };
     let t = preprocess(name);
     let layoutName =
-      locals._ayout === undefined ? (t.layoutName ?? null) : locals._ayout;
+      locals._layout === undefined ? (t.layoutName ?? null) : locals._layout;
 
     // Named slots render independently so the layout can place them.
     let slots = {};
@@ -176,7 +146,13 @@ export function makeView(viewDir = VIEWS_ROOT) {
   }
 
   // Shared renderer passed to controllers via res.render
-  let renderer = (name, data = {}) => renderName(name, data);
+  let renderer = (name, data = {}) => {
+    let locals = data;
+    if (hasMarkdown && !data.formatDate) {
+      locals = { formatDate: markdown.formatDate, ...data };
+    }
+    return renderName(name, locals);
+  };
 
   return { render: renderer, renderName, sink };
 }
